@@ -18,9 +18,6 @@ namespace OdeToFood.Controllers
 			_logger = logger;
 		}
 
-		public HomeController()
-		{
-		}
 
 		public IActionResult Index()
 		{
@@ -30,7 +27,7 @@ namespace OdeToFood.Controllers
 		{
 			var model = new AboutModel()
 			{
-				Name = "Kristjan Kivikangur",
+				Name = "Alexandros Krenštrauch",
 				Location = "Tallinn"
 			};
 			return View(model);
