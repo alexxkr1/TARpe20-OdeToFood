@@ -10,7 +10,9 @@ namespace OdeToFood.Controllers
     {
         public IActionResult Search(string name="french")
         {
-            return Content(name);
+            throw new Exception("Something is so bad");
+
+            return Content("esimene" + name);
         }
     }
 }
