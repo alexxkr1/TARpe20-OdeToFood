@@ -8,7 +8,6 @@ namespace OdeToFood.Models
 
         [Required, StringLength(80)]
         public string Name { get; set; }
-
         [Required, StringLength(255)]
         public string City { get; set; }
         [Required, StringLength(255)]

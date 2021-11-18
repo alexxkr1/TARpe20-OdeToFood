@@ -7,12 +7,16 @@ using System.Threading.Tasks;
 using OdeToFood.Models;
 namespace OdeToFood.Controllers
 {
-    public class RestarauntController : Controller
+    public class ReviewsController : Controller
     {
         // GET: Review
         public ActionResult Index()
         {
-            return View();
+            var model =
+                from r in _reviews
+                orderby r.Country
+                select r;
+            return View(model);
         }
 
         // GET: Review/Details/5
@@ -92,6 +96,22 @@ namespace OdeToFood.Controllers
                 City = "Tallinn",
                 Country = "Estonia",
                 Rating = 5
+            },
+            new RestarauntReview
+            {
+                Id = 2,
+                Name = "Alext",
+                City = "Taty",
+                Country = "Estonia",
+                Rating = 4
+            },
+            new RestarauntReview
+            {
+                Id = 3,
+                Name = "Alexx",
+                City = "yolo",
+                Country = "Estonia",
+                Rating = 3
             }
         };
     }
