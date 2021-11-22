@@ -1,17 +1,26 @@
 ﻿@model IEnumerable<OdeToFood.Models.RestarauntReview>
 
 @{
-    ViewData["Title"] = "Home Page";
+    ViewData["Title"] = "Reviews";
+}
+@section featured {
+    <p>We are showing the latest @Model.Count() Reviews.</p>
 }
 
 <h1>The latest reviews</h1>
-<p>We are showing the latest @Model.Count() Reviews.</p>
+
 
 @foreach (var item in Model)
 {
-    <div class="review">
-        <h4>@item.Name</h4>
-        <span>@item.Rating</span>
-        <p>@item.City, @item.Country</p>
-    </div>
+<div class="review">
+    <h4>@item.Name</h4>
+    <span>@item.Rating</span>
+    <p>@item.City, @item.Country</p>
+    <span class="right">@Html.ActionLink("Edit", "Edit", new { id = item.Id })</span>
+</div>
 }
+
+
+<p>
+    <a asp-action="Create">Create New</a>
+</p>
