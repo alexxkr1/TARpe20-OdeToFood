@@ -13,6 +13,7 @@ namespace OdeToFood.Data
 						: base(options)
 		{
 		}
-		public DbSet<OdeToFood.Models.RestarauntReview> RestarauntReview { get; set; }
-	}
+		public DbSet<OdeToFood.Models.RestaurantReview> RestarauntReview { get; set; }
+        public object Restaurants { get; internal set; }
+    }
 }

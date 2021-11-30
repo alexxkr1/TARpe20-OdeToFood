@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
+using OdeToFood.Data;
 using OdeToFood.Models;
 using System;
 using System.Collections.Generic;
@@ -12,22 +13,47 @@ namespace OdeToFood.Controllers
 	public class HomeController : Controller
 	{
 		private readonly ILogger<HomeController> _logger;
+		private ApplicationDbContext _context;
 
-		public HomeController(ILogger<HomeController> logger)
+		public HomeController(ILogger<HomeController> logger, ApplicationDbContext context)
 		{
 			_logger = logger;
+			_context = context;
 		}
-
 
 		public IActionResult Index()
 		{
-			return View();
+			var model =
+				from r in context.Restaurants
+				orderby r.Reviews.Average(review => review.Rating) descending
+				select new RestaurantListViewModel
+				{
+					Id = r.Id,
+					Name = r.Name,
+					City = r.City,
+					Country = r.Country,
+					CountOfReviews = r.Reviews.Count
+				};
+			//var model = _context.Restaurants
+			//	.OrderByDescending(
+			//		r => r.Reviews.Average(review => review.Rating)
+			//		)
+			//	.Select(r => new RestaurantListViewModel
+			//	{
+			//		Id = r.Id,
+			//		Name = r.Name,
+			//		City = r.City,
+			//		Country = r.Country,
+			//		CountOfReviews = r.Reviews.Count
+			//	});
+
+			return View(model);
 		}
 		public IActionResult About()
 		{
 			var model = new AboutModel()
 			{
-				Name = "Alexandros Krenštrauch",
+				Name = "Alexandros Kivikangur",
 				Location = "Tallinn"
 			};
 			return View(model);

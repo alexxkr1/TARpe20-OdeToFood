@@ -11,10 +11,10 @@ namespace OdeToFood.Components
 	[ViewComponent(Name = "BestReview")]
 	public class BestReview : ViewComponent
 	{
-		private List<RestarauntReview> _reviews;
+		private List<RestaurantReview> _reviews;
 		public BestReview()
 		{
-            _reviews = Controllers.ReviewsController._reviews;
+			//_reviews = Controllers.ReviewsController._reviews;
 		}
 		public async Task<IViewComponentResult> InvokeAsync()
 		{
