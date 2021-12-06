@@ -1,118 +1,67 @@
-﻿//using Microsoft.AspNetCore.Http;
-//using Microsoft.AspNetCore.Mvc;
-//using System;
-//using System.Collections.Generic;
-//using System.Linq;
-//using System.Threading.Tasks;
-//using OdeToFood.Models;
-//namespace OdeToFood.Controllers
-//{
-//    public class ReviewsController : Controller
-//    {
-//        // GET: Review
-//        public ActionResult Index()
-//        {
-//            var model =
-//                from r in _reviews
-//                orderby r.Country
-//                select r;
-//            return View(model);
-//        }
+﻿using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using OdeToFood.Data;
+using OdeToFood.Models;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 
-//        // GET: Review/Details/5
-//        public ActionResult Details(int id)
-//        {
-//            return View();
-//        }
+namespace OdeToFood.Controllers
+{
+	public class ReviewsController : Controller
+	{
+		private readonly ApplicationDbContext _context;
 
-//        // GET: Review/Create
-//        public ActionResult Create()
-//        {
-//            return View();
-//        }
+		public ReviewsController(ApplicationDbContext context)
+		{
+			_context = context;
+		}
+		// GET: ReviewsController
+		public ActionResult Index([Bind(Prefix = "id")] int restaurantId)
+		{
+			var model = _context.Restaurants
+				.FirstOrDefault(r => r.Id == restaurantId);
+			if (model == null)
+			{
+				return NotFound();
+			}
+			return View(model);
+		}
 
-//        // POST: Review/Create
-//        [HttpPost]
-//        [ValidateAntiForgeryToken]
-//        public ActionResult Create(IFormCollection collection)
-//        {
-//            try
-//            {
-//                return RedirectToAction(nameof(Index));
-//            }
-//            catch
-//            {
-//                return View();
-//            }
-//        }
-
-//        // GET: ReviewsController/Edit/5
-//        public ActionResult Edit(int id)
-//        {
-//            var review = _reviews.Single(r => r.Id == id);
-//            return View(review);
-//        }
-
-//        // POST: ReviewsController/Edit/5
-//        [HttpPost]
-//        [ValidateAntiForgeryToken]
-//        public async Task<ActionResult> Edit(int id, IFormCollection collection)
-//        {
-//            var review = _reviews.Single(r => r.Id == id);
-//            if (await TryUpdateModelAsync(review))
-//            {
-//                return RedirectToAction("Index");
-//            }
-//            return View(review);
-//        }
-
-//        // GET: Review/Delete/5
-//        public ActionResult Delete(int id)
-//        {
-//            return View();
-//        }
-
-//        // POST: Review/Delete/5
-//        [HttpPost]
-//        [ValidateAntiForgeryToken]
-//        public ActionResult Delete(int id, IFormCollection collection)
-//        {
-//            try
-//            {
-//                return RedirectToAction(nameof(Index));
-//            }
-//            catch
-//            {
-//                return View();
-//            }
-//        }
-//        private static List<RestarauntReview> _reviews = new List<RestarauntReview>
-//        {
-//            new RestarauntReview
-//            {
-//                Id = 1,
-//                Name = "Alex",
-//                City = "Tallinn",
-//                Country = "Estonia",
-//                Rating = 5
-//            },
-//            new RestarauntReview
-//            {
-//                Id = 2,
-//                Name = "Alext",
-//                City = "Taty",
-//                Country = "Estonia",
-//                Rating = 4
-//            },
-//            new RestarauntReview
-//            {
-//                Id = 3,
-//                Name = "Alexx",
-//                City = "yolo",
-//                Country = "Estonia",
-//                Rating = 3
-//            }
-//        };
-//    }
-
-//}
+		[HttpGet]
+		public ActionResult Create(int restaurantId)
+		{
+			return View();
+		}
+		[HttpPost]
+		public ActionResult Create(RestaurantReview review)
+		{
+			if (ModelState.IsValid)
+			{
+				_context.Reviews.Add(review);
+				_context.SaveChanges();
+				return RedirectToAction(nameof(Index), new { id = review.RestaurantId });
+			}
+			return View(review);
+		}
+		[HttpGet]
+		public ActionResult Edit(int id)
+		{
+			var model = _context.Reviews.Find(id);
+			return View(model);
+		}
+		[HttpPost]
+		public ActionResult Edit(RestaurantReview review)
+		{
+			if (ModelState.IsValid)
+			{
+				_context.Entry(review).State = EntityState.Modified;
+				_context.SaveChanges();
+				return RedirectToAction(nameof(Index), new { id = review.RestaurantId });
+			}
+			return View(review);
+		}
+	}
+}

@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpsPolicy;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.UI;
+using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -28,8 +29,12 @@ namespace OdeToFood
 		public void ConfigureServices(IServiceCollection services)
 		{
 			services.AddDbContext<ApplicationDbContext>(options =>
-							options.UseSqlServer(
-											Configuration.GetConnectionString("DefaultConnection")));
+							options
+							//	.UseLazyLoadingProxies()
+								.UseSqlServer(
+											Configuration
+											.GetConnectionString("DefaultConnection")
+											).EnableSensitiveDataLogging());
 			services.AddDatabaseDeveloperPageExceptionFilter();
 
 			services.AddDefaultIdentity<IdentityUser>(options => options.SignIn.RequireConfirmedAccount = true)
@@ -40,6 +45,7 @@ namespace OdeToFood
 		// This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
 		public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
 		{
+			SetupAppData(app, env);
 			if (env.IsDevelopment())
 			{
 				app.UseDeveloperExceptionPage();
@@ -61,12 +67,45 @@ namespace OdeToFood
 
 			app.UseEndpoints(endpoints =>
 			{
-				endpoints.MapControllerRoute("Cuisine", "cuisine/{name}", new { controller = "Cuisine", action = "Search"});
+				endpoints.MapControllerRoute(
+									"Cuisine", "cuisine/{name?}",
+									new { controller = "Cuisine", action = "Search" }
+				);
 				endpoints.MapControllerRoute(
 																	name: "default",
 																	pattern: "{controller=Home}/{action=Index}/{id?}");
 				endpoints.MapRazorPages();
 			});
+		}
+
+		private void SetupAppData(IApplicationBuilder app, IWebHostEnvironment env)
+		{
+			using var serviceScope = app
+				.ApplicationServices
+				.GetRequiredService<IServiceScopeFactory>()
+				.CreateScope();
+			using var context = serviceScope
+				.ServiceProvider
+				.GetService<ApplicationDbContext>();
+			if (context == null)
+			{
+				throw new ApplicationException("Problem in services. Can not initialize ApplicationDbContext");
+			}
+			while (true)
+			{
+				try
+				{
+					context.Database.OpenConnection();
+					context.Database.CloseConnection();
+					break;
+				}
+				catch (SqlException e)
+				{
+					if (e.Message.Contains("The login failed.")) { break; }
+					System.Threading.Thread.Sleep(1000);
+				}
+			}
+			AppDataInit.SeedRestaurant(context);
 		}
 	}
 }
