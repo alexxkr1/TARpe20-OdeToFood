@@ -23,7 +23,8 @@ namespace OdeToFood.Data
 							new RestaurantReview()
 							{
 								Rating = 10,
-								Body = "Superlahe"
+								Body = "Superlahe",
+								ReviewerName = "ReviewerName"
 							}
 						}
 					});
