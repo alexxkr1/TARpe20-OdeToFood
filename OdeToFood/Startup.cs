@@ -30,7 +30,7 @@ namespace OdeToFood
 		{
 			services.AddDbContext<ApplicationDbContext>(options =>
 							options
-							//	.UseLazyLoadingProxies()
+                                .UseLazyLoadingProxies()
 								.UseSqlServer(
 											Configuration
 											.GetConnectionString("DefaultConnection")
