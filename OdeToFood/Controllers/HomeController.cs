@@ -1,4 +1,4 @@
-﻿using AspNetCore.Unobtrusive.Ajax;
+﻿
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
@@ -23,6 +23,18 @@ namespace OdeToFood.Controllers
 			_context = context;
 		}
 
+		public ActionResult Autocomplete(string term)
+        {
+			var model = _context.Restaurants
+				.Where(r => r.Name.StartsWith(term))
+				.Take(10)
+				.Select(r => new
+				{
+					label = r.Name
+				});
+			return Json(model);
+        }
+
 		public IActionResult Index(string searchTerm = null)
 		{
 			var model = _context.Restaurants
@@ -39,10 +51,10 @@ namespace OdeToFood.Controllers
 					CountOfReviews = r.Reviews.Count
 				});
 
-			if (Request.IsAjaxRequest())
-			{
-				return PartialView("_Restaurants", model);
-			}
+			//if (Request.IsAjaxRequest())
+			//{
+			//	return PartialView("_Restaurants", model);
+			//}
 
 			return View(model);
 		}
