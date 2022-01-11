@@ -10,6 +10,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using OdeToFood.Data;
+using OdeToFood.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -39,8 +40,11 @@ namespace OdeToFood
 			services.AddDatabaseDeveloperPageExceptionFilter();
 			services.AddUnobtrusiveAjax();
 
-			services.AddDefaultIdentity<IdentityUser>(options => options.SignIn.RequireConfirmedAccount = true)
-							.AddEntityFrameworkStores<ApplicationDbContext>();
+			services.AddIdentity<UserProfile, AppRole>(options => options.SignIn.RequireConfirmedAccount = true)
+				.AddDefaultUI()
+				.AddDefaultTokenProviders()
+				.AddEntityFrameworkStores<ApplicationDbContext>();
+
 			services.AddControllersWithViews();
 		}
 
@@ -87,6 +91,10 @@ namespace OdeToFood
 				.ApplicationServices
 				.GetRequiredService<IServiceScopeFactory>()
 				.CreateScope();
+
+			using var userManager = serviceScope.ServiceProvider.GetService<UserManager<UserProfile>>();
+			using var roleManager = serviceScope.ServiceProvider.GetService<RoleManager<AppRole>>();
+
 			using var context = serviceScope
 				.ServiceProvider
 				.GetService<ApplicationDbContext>();
@@ -108,6 +116,7 @@ namespace OdeToFood
 					System.Threading.Thread.Sleep(1000);
 				}
 			}
+			AppDataInit.SeedIdentity(userManager, roleManager);
 			AppDataInit.SeedRestaurant(context);
 		}
 	}
